@@ -625,6 +625,16 @@ def internal_server_error(error):
     db.session.rollback()
     return render_template("500.html"), 500
 
+@app.route("/check_admin")
+def check_admin():
+
+    admins = Admin.query.all()
+
+    return {
+        "count": len(admins),
+        "admins": [a.username for a in admins]
+    }
+
 
 if __name__ == "__main__":
     app.run(debug=True)
