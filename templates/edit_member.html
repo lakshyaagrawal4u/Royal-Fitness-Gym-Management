@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Member</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>Royal Fitness</h2>
+
+    <a href="{{ url_for('dashboard') }}"><i class='bx bxs-dashboard'></i> Dashboard</a>
+
+    <a href="{{ url_for('members') }}">
+        <i class='bx bxs-user'></i> Members
+    </a>
+
+    <a href="{{ url_for('add_member') }}"><i class='bx bx-plus'></i> Add Member</a>
+
+    <a href="#"><i class='bx bx-money'></i> Payments</a>
+
+    <a href="#"><i class='bx bx-time'></i> Due Members</a>
+
+    <a href="#"><i class='bx bx-log-out'></i> Logout</a>
+
+</div>
+
+<div class="main">
+
+    <h1>Edit Member</h1>
+
+    <div class="form-container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+
+            {% for message in messages %}
+
+                <div class="success-message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+    {% endwith %}
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text"
+                    name="name"
+                    value="{{ member.name }}"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Mobile Number</label>
+                <input type="text"
+                    value="{{ member.phone }}"
+                    name="phone"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Age</label>
+                <input type="number"
+                    value="{{ member.age }}"
+                    name="age"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label>Gender</label>
+
+                <select name="gender">
+
+                <option value="Male"
+                Male
+                {% if member.gender=="Male" %}selected{% endif %}>
+                </option>
+
+                <option value="Female"
+                {% if member.gender=="Female" %}selected{% endif %}>
+                Female
+                </option>
+
+                <option value="Other"
+                {% if member.gender=="Other" %}selected{% endif %}>
+                Other
+                </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <textarea name="address">{{ member.address }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Joining Date</label>
+
+                <input
+                    type="date"
+                    name="joining_date"
+                    value="{{ member.joining_date.strftime('%Y-%m-%d') }}">
+            </div>
+
+            <div class="form-group">
+                <label>Fee Paid Till</label>
+
+                <input
+                    type="date"
+                    name="last_fee_paid"
+                    value="{{ member.last_fee_paid.strftime('%Y-%m-%d') if member.last_fee_paid else '' }}">
+            </div>
+            <div class="form-group">
+                <label>Membership Plan</label>
+
+                <select name="plan">
+
+                <option value="Basic"
+                {% if member.membership_plan=="Basic" %}selected{% endif %}>
+                Basic
+                </option>
+
+                <option value="Pro"
+                {% if member.membership_plan=="Pro" %}selected{% endif %}>
+                Pro
+                </option>
+
+                <option value="Premium"
+                {% if member.membership_plan=="Premium" %}selected{% endif %}>
+                Premium
+                </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+                <label>Trainer Name</label>
+                <input
+                    type="text"
+                    name="trainer"
+                    value="{{ member.trainer }}">
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Fee</label>
+                <input
+                    type="number"
+                    name="fee"
+                    value="{{ member.monthly_fee }}">
+            </div>
+
+            <button class="save-btn">
+
+                Update Member
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

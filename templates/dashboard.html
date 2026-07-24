@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <title>Dashboard</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet"
+    href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Royal Fitness</h2>
+
+    <a href="#"><i class='bx bxs-dashboard'></i> Dashboard</a>
+
+    <a href="{{ url_for('members') }}">
+        <i class='bx bxs-user'></i> Members
+    </a>
+
+    <a href="{{ url_for('add_member') }}">
+        <i class='bx bx-plus'></i> Add Member
+    </a>
+
+    <a href="{{ url_for('payments') }}">
+        <i class='bx bx-money'></i> Payments
+    </a>
+
+    <a href="{{ url_for('due_members') }}">
+        <i class='bx bx-time'></i> Due Members
+    </a>
+
+    <a href="{{ url_for('change_password') }}">
+        Change Password
+    </a>
+
+    <a href="{{ url_for('logout') }}">
+        <i class='bx bx-log-out'></i>
+        Logout
+    </a>
+
+</div>
+
+<div class="main">
+
+    <h1>Dashboard</h1>
+
+    <div class="cards">
+
+        <div class="card">
+            <h2>Total Members</h2>
+            <h1>{{ total_members }}</h1>
+        </div>
+
+        <div class="card">
+            <h2>Today's Collection</h2>
+            <h1>₹{{ total_collection }}</h1>
+        </div>
+
+        <div class="card">
+            <h2>Due Members</h2>
+            <h1>{{ due_members }}</h1>
+        </div>
+
+
+    </div>
+
+</div>
+
+</body>
+</html>

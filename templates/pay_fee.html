@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pay Fee</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>Royal Fitness</h2>
+
+    <a href="{{ url_for('dashboard') }}">
+        <i class='bx bxs-dashboard'></i> Dashboard
+    </a>
+
+    <a href="{{ url_for('members') }}">
+        <i class='bx bxs-user'></i> Members
+    </a>
+
+    <a href="{{ url_for('add_member') }}">
+        <i class='bx bx-plus'></i> Add Member
+    </a>
+
+    <a href="{{ url_for('payments') }}">
+        <i class='bx bx-money'></i> Payments
+    </a>
+
+    <a href="#">
+        <i class='bx bx-time'></i> Due Members
+    </a>
+
+</div>
+
+<div class="main">
+
+    <h1>Pay Member Fee</h1>
+
+    <div class="form-container">
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Member Name</label>
+
+                <input
+                    type="text"
+                    value="{{ member.name }}"
+                    readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Monthly Fee</label>
+
+                <input
+                type="text"
+                value="₹ {{ member.monthly_fee }}"
+                readonly>
+            </div>
+
+            <div class="form-group">
+                <label>Fee Paid Till</label>
+
+                <input
+                type="text"
+                value="{{ member.last_fee_paid if member.last_fee_paid else 'No Payment Yet' }}"
+                readonly>
+            </div>
+            <div class="form-group">
+
+                <label>Next Due Date</label>
+
+                <input
+                    type="text"
+                    value="{{ next_due.strftime('%d-%m-%Y') }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+                <label>Pending Months</label>
+
+                <input
+                type="number"
+                value="{{ pending_months }}"
+                readonly>
+            </div>
+
+            <div class="form-group">
+
+                <label>Months Paying</label>
+
+                <select
+                    id="months_paid"
+                    name="months_paid">
+
+                    {% for i in range(1,13) %}
+
+                    <option
+                        value="{{ i }}"
+                        {% if i == pending_months %}selected{% endif %}>
+
+                        {{ i }}
+
+                    </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Total Amount</label>
+
+                <input
+                    type="text"
+                    id="total_amount"
+                    value="₹ {{ total_amount }}"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+                <label>Payment Date</label>
+
+                <input
+                    type="date"
+                    name="payment_date"
+                    value="{{ today }}"
+                    required>
+            </div>
+            
+            <div class="form-group">
+
+                <label>Payment Mode</label>
+
+                <select name="payment_mode">
+
+                    <option>Cash</option>
+
+                    <option>UPI</option>
+
+                    <option>Card</option>
+
+                </select>
+
+            </div>
+            <div class="form-group">
+                <label>Remarks</label>
+
+                <textarea
+                    name="remarks"
+                    placeholder="Optional"></textarea>
+            </div>
+
+            <button class="save-btn">
+
+                Save Payment
+
+            </button>
+
+           <script>
+
+            const monthlyFee = Number("{{ member.monthly_fee }}");
+
+            const months = document.getElementById("months_paid");
+
+            const total = document.getElementById("total_amount");
+
+            months.addEventListener("change", function(){
+
+                total.value = "₹ " + (monthlyFee * parseInt(months.value));
+
+            });
+
+            </script>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

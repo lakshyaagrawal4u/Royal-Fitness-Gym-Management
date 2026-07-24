@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Due Members</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+
+<div class="sidebar">
+
+    <h2>Royal Fitness</h2>
+
+    <a href="{{ url_for('dashboard') }}">
+        <i class='bx bxs-dashboard'></i> Dashboard
+    </a>
+
+    <a href="{{ url_for('members') }}">
+        <i class='bx bxs-user'></i> Members
+    </a>
+
+    <a href="{{ url_for('add_member') }}">
+        <i class='bx bx-plus'></i> Add Member
+    </a>
+
+    <a href="{{ url_for('payments') }}">
+        <i class='bx bx-money'></i> Payments
+    </a>
+
+    <a href="{{ url_for('due_members') }}">
+        <i class='bx bx-time'></i> Due Members
+    </a>
+
+</div>
+
+<div class="main">
+
+<h1>Due Members</h1>
+
+<table class="member-table">
+
+<thead>
+
+<tr>
+
+<th>Name</th>
+<th>Phone</th>
+<th>Overdue</th>
+<th>Pending Months</th>
+<th>Monthly Fee</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for item in due_members %}
+
+<tr>
+
+<td>{{ item.member.name }}</td>
+
+<td>{{ item.member.phone }}</td>
+
+
+<td>
+
+{% if item.overdue_days == 0 %}
+
+<span class="due-today">
+    🟡 Due Today
+</span>
+
+{% elif item.overdue_days <= 7 %}
+
+<span class="due-warning">
+    🟠 {{ item.overdue_days }} Day(s)
+</span>
+
+{% else %}
+
+<span class="due-danger">
+    🔴 {{ item.overdue_days }} Day(s)
+</span>
+
+{% endif %}
+
+<td>{{ item.pending_months }}</td>
+
+</td>
+
+<td>₹ {{ item.member.monthly_fee }}</td>
+
+<td>
+
+    <a href="{{ url_for('pay_fee', id=item.member.id) }}"
+       class="btn btn-success">
+        💰 Collect Fee
+    </a>
+
+    <a href="{{ url_for('send_reminder', id=item.member.id) }}"
+       class="btn btn-primary">
+        💬 WhatsApp
+    </a>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</body>
+</html>

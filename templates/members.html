@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members</title>
+
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+
+<body>
+
+    <div class="sidebar">
+
+        <h2>Royal Fitness</h2>
+
+        <a href="{{ url_for('dashboard') }}">
+            <i class='bx bxs-dashboard'></i>
+            Dashboard
+        </a>
+
+        <a href="{{ url_for('members') }}">
+            <i class='bx bxs-user'></i>
+            Members
+        </a>
+
+        <a href="{{ url_for('add_member') }}">
+            <i class='bx bx-plus'></i>
+            Add Member
+        </a>
+
+    </div>
+
+    <div class="main">
+
+        <h1>Members List</h1>
+        <div class="search-container">
+
+            <form method="GET" action="{{ url_for('members') }}">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Search by Name or Mobile..."
+                value="{{ search }}"
+                class="search-input"
+            >
+
+            <button type="submit" class="search-btn">
+                <i class='bx bx-search'></i> Search
+            </button>
+
+            {% if search %}
+            <a href="{{ url_for('members') }}" class="clear-btn">
+                Clear
+            </a>
+            {% endif %}
+
+    </form>
+
+</div>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+
+                    <div class="success-message">
+                        {{ message }}
+                    </div>
+
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+        <table class="member-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Plan</th>
+                    <th>Fee</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                {% for member in members %}
+
+                <tr>
+
+                    <td>{{ member.id }}</td>
+
+                    <td>{{ member.name }}</td>
+
+                    <td>{{ member.phone }}</td>
+
+                    <td>{{ member.membership_plan }}</td>
+
+                    <td>₹ {{ member.monthly_fee }}</td>
+
+                    <td>{{ member.status }}</td>
+
+                    <td>
+
+                        <a href="{{ url_for('edit_member', id=member.id) }}" class="edit-btn">
+                            <i class='bx bx-edit'></i>
+                        </a>
+
+                        <a href="{{ url_for('delete_member', id=member.id) }}"
+                            class="delete-btn"
+                            onclick="return confirm('Are you sure you want to delete this member?')">
+
+                            <i class='bx bx-trash'></i>
+
+                        </a>
+
+                        <a href="{{ url_for('pay_fee', id=member.id) }}"
+                            class="pay-btn">
+
+                            <i class='bx bx-wallet'></i>
+
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</body>
+</html>

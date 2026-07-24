@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <title>Royal Fitness | Gym Management System</title>
+</head>
+<body>
+    <!--Header Section Code-->
+    <header>
+
+        <a href="#home" class="logo">Royal <span>Fitness</span></a>
+
+        <div class='bx bx-menu' id="menu-icon"></div>
+        <ul class="navbar">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#bmi">BMI</a></li>
+            <li><a href="#plans">Pricing</a></li>
+
+    </ul>
+    <div class="top-btn">
+        <a href="https://wa.me/917878519089?text=Hello%20Royal%20Fitness,%20I%20want%20to%20join%20your%20gym.      %20Please%20share%20the%20membership%20plans%20and%20timings."
+            target="_blank"
+            class="btn">
+            Join Us
+        </a>
+    </div>
+
+    </header>
+    <!--Home Section Code -->
+   <section class="home" id="home">
+
+        <div class="home-content" data-aos="zoom-in">
+            <h3>Build Your</h3>
+            <h1>Dream Physique</h1>
+            <h3><span class="multiple-text"></span></h3>
+
+            <p>
+                Transform your body and achieve your fitness goals with expert trainers, modern equipment, and personalized workout plans. Join Royal Fitness today and begin your journey toward a healthier, stronger, and more confident life.
+            </p>
+
+            <a href="#" class="btn">Join Us</a>
+        </div>  
+
+            <div class="home-img" data-aos="zoom-in">
+                <img src="{{ url_for('static', filename='images/img2.png') }}" alt="Home Image">
+            </div>
+       
+    </section>
+
+    <!--Service Section Code-->
+    <section class="services" id="services">
+        <h2 class="heading" data-aos="zoom-in-down">Our <span>Services</span></h2>
+
+        <div class="services-content" data-aos="zoom-in-up">
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img3.png') }}">
+
+                <h4>Physical Fitness</h4>
+            </div>
+
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img11.png') }}">
+
+                <h4>Weight Gain</h4>
+            </div>
+
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img5.png') }}">
+
+                <h4>Strength Training</h4>
+            </div>
+
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img10.png') }}">
+
+                <h4>Fat Lose</h4>
+            </div>
+
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img7.png') }}">
+
+                <h4>Weight Lifting</h4>
+            </div>
+
+            <div class="row">
+                <img src="{{ url_for('static', filename='images/img8.png') }}">
+
+                <h4>Running </h4>
+            </div>
+        </div>
+    </section>
+
+    <!--About Section code-->
+    <section class="about" id="about">
+        <div class="about-img" data-aos="zoom-in-down">
+            <img src="{{ url_for('static', filename='images/img9.png') }}">
+        </div>
+
+        <div class="about-content" data-aos="zoom-in-up">
+            <h2 class="heading">Why Choose Us</h2>
+
+            <p>Our Diverse membership base creates a friendly and supportive atmosphere,where you can make friends and stay motivated</p>
+            <p>
+            At Royal Fitness, we are committed to helping every member achieve their personal fitness goals. Our certified trainers create customized workout plans tailored to your body type, experience level, and objectives.
+            </p>
+
+            <p>
+            Our gym features modern equipment, a clean and motivating environment, flexible membership plans, and professional guidance to ensure safe and effective training.
+            </p>
+
+            <p>
+            Whether your goal is weight loss, muscle gain, strength building, or overall wellness, Royal Fitness is the perfect place to begin your transformation.
+            </p>
+
+            <a href="#" class="btn">Book a Free Class</a>
+        </div>
+    </section>
+
+        <!-- BMI Calculator -->
+    <section class="bmi" id="bmi">
+        <h2 class="heading">BMI <span>Calculator</span></h2>
+
+        <div class="bmi-container">
+
+            <div class="bmi-card">
+
+                <div class="circle">
+                    <svg width="220" height="220">
+                        <circle cx="110" cy="110" r="90" class="bg"></circle>
+                        <circle cx="110" cy="110" r="90" class="progress" id="progressCircle"></circle>
+                    </svg>
+
+                    <div class="number">
+                        <h2 id="bmiValue">0.0</h2>
+                        <span>BMI</span>
+                    </div>
+                </div>
+
+                <input type="number" id="height" placeholder="Height (cm)">
+                <input type="number" id="weight" placeholder="Weight (kg)">
+
+                <button class="btn" onclick="calculateBMI()">
+                    Calculate BMI
+                </button>
+
+                <h3 id="status"></h3>
+                <p id="tip"></p>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!--Pricing Section Code -->
+    <section class="plans" id="plans">
+        <h2 class="heading" data-aos="zoom-in-down">Our <span>Plans</span></h2>
+
+        <div class="plans-content" data-aos="zoom-in-up">
+
+            <div class="box">
+                <h3>BASIC</h3>
+                <h2><span>$100/Month</span></h2>
+                <ul>
+                    <li>Smart Workout Plan</li>
+                    <li>At Home Workout</li>
+                </ul>
+                <a href="#">
+                    Join Now
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+            </div>
+
+            <div class="box">
+                <h3>Pro</h3>
+                <h2><span>$150/Month</span></h2>
+                <ul>
+                    <li>Professional Gym Access</li>
+                    <li>Smart Workout Plan</li>
+                    <li>At Home Workout</li>
+                </ul>
+                <a href="#">
+                    Join Now
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+            </div>
+
+            <div class="box">
+                <h3>PREMIUM</h3>
+                <h2><span>$300/Month</span></h2>
+                <ul>
+                    <li>ELITE GYMS and Classes</li>
+                    <li>Pro GYMs</li>
+                    <li>Smart Workout Plan</li>
+                    <li>At Home Workout</li>
+                    <li>Personal Training</li>
+                </ul>
+                <a href="#">
+                    Join Now
+                    <i class='bx bx-right-arrow-alt'></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+<footer class="footer">
+
+    <div class="social">
+        <a href="#"><i class="bx bxl-facebook"></i></a>
+        <a href="#"><i class="bx bxl-instagram"></i></a>
+    </div>
+
+    <div class="contact-info">
+
+        <p>
+            <i class='bx bx-map'></i>
+            Mehandipur Balaji, Rajasthan
+        </p>
+
+        <p>
+            <i class='bx bx-phone'></i>
+            <a href="tel:+919876543210">+91 9876543210</a>
+        </p>
+
+    </div>
+
+    <div class="admin-portal">
+        <a href="{{ url_for('login') }}">
+            <i class='bx bx-lock-alt'></i> Admin Portal
+        </a>
+    </div>
+
+    <p class="copyright">
+        &copy; Royal Fitness 2026 - All Rights Reserved
+    </p>
+
+</footer>
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            offset: 300,
+            duration: 1400,
+        });
+    </script>
+    <script src="https://unpkg.com/typed.js@2.1.0/dist/typed.umd.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
