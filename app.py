@@ -16,9 +16,24 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize Database
 db.init_app(app)
 
-# Create Database Tables
+# Create Database Tables & Default Admin
 with app.app_context():
+
     db.create_all()
+
+    admin = Admin.query.filter_by(username="admin").first()
+
+    if not admin:
+
+        admin = Admin(
+            username="admin",
+            password=generate_password_hash("admin123")
+        )
+
+        db.session.add(admin)
+        db.session.commit()
+
+        print("✅ Default Admin Created")
 
 def get_due_members():
 
