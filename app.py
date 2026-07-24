@@ -641,21 +641,18 @@ def check_admin():
         "admins": [a.username for a in admins]
     }
 
+
+
 @app.route("/debug")
 def debug():
 
-    from pathlib import Path
-    import os
-
-    admins = Admin.query.all()
+    admin = Admin.query.filter_by(username="admin").first()
 
     return {
-        "cwd": os.getcwd(),
-        "db_uri": app.config["SQLALCHEMY_DATABASE_URI"],
-        "instance_path": app.instance_path,
-        "db_exists": Path(app.instance_path + "/gym.db").exists(),
-        "admins": [a.username for a in admins],
-        "admin_count": len(admins)
+        "admin_count": Admin.query.count(),
+        "admins": [a.username for a in Admin.query.all()],
+        "password_match": check_password_hash(admin.password, "admin123"),
+        "stored_hash": admin.password
     }
 
 if __name__ == "__main__":
