@@ -105,12 +105,18 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
+        print("Username:", username)
+
         admin = Admin.query.filter_by(username=username).first()
 
+        print("Admin Found:", admin)
+
+        if admin:
+            print("Stored Hash:", admin.password)
+            print("Password Match:", check_password_hash(admin.password, password))
+
         if admin and check_password_hash(admin.password, password):
-
             session["admin"] = admin.username
-
             return redirect(url_for("dashboard"))
 
         flash("Invalid Username or Password")
