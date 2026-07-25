@@ -10,7 +10,16 @@ app = Flask(__name__)
 
 # Configuration
 app.config["SECRET_KEY"] = "royalfitness123"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///gym.db"
+import os
+
+database_url = os.getenv("DATABASE_URL")
+
+if database_url:
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+else:
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///gym.db"
+
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize Database
