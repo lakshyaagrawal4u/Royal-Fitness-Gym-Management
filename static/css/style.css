@@ -125,9 +125,7 @@ span {
     font-weight:550;
 }
 
-span {
-    color: var(--main-color);
-}
+
 
 .home-content h1{
     font-size:5.6rem;
@@ -219,10 +217,16 @@ span {
     line-height: 1.4;
 }
 
-.row:hover {
-    border: 1px solid var(--main-color);
-    transform: translateY(-5px) scale(1.04);
-    cursor: pointer;
+.row{
+    transition: transform 0.35s ease,
+                box-shadow 0.35s ease,
+                border-color 0.35s ease;
+}
+
+.row:hover{
+    transform: translateY(-8px);
+    box-shadow:0 12px 30px rgba(105,255,105,.25);
+    border-color:var(--main-color);
 }
 
 /* About Section Code*/
@@ -517,7 +521,8 @@ span {
 }
 
 .bmi-card{
-    width:420px;
+     width:100%;
+    max-width:430px;
     background:#111;
     border:2px solid var(--main-color);
     border-radius:25px;
@@ -584,7 +589,7 @@ span {
 }
 
 .number span{
-    font-size:18px;
+    font-size:16px;
     color:var(--main-color);
 }
 
@@ -673,7 +678,8 @@ span {
 
 .login-box{
 
-    width:400px;
+    width:100%;
+    max-width:400px;
     background:#111;
     padding:40px;
     border-radius:20px;
@@ -785,9 +791,11 @@ background:#1d1d1d;
         background:#111;
         display:flex;
         flex-direction:column;
-        border-radius:0 0 0 15px;
-        transition:.4s;
-        padding:20px;
+        align-items:center;
+        justify-content:flex-start;
+        padding-top:40px;
+        transition:0.4s ease;
+        box-shadow:-5px 0 20px rgba(0,0,0,.4);
     }
 
     .navbar.active{
@@ -795,13 +803,18 @@ background:#1d1d1d;
     }
 
     .navbar li{
-        margin:15px 0;
+        width:100%;
+        text-align:center;
     }
 
     .navbar a{
         margin-left:0;
         display:block;
         font-size:2rem;
+    }
+
+    .logo{
+        font-size:2.4rem;
     }
 
 }
@@ -841,5 +854,116 @@ background:#1d1d1d;
 .contact-info a:hover{
 
     color:#25D366;
+
+}
+
+/* ============================= */
+/* HERO SECTION RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 991px){
+
+    .home{
+        flex-direction: column-reverse;
+        text-align: center;
+        gap: 3rem;
+        padding-top: 12rem;
+    }
+
+    .home-content h1{
+        font-size: 4.2rem;
+        line-height: 1.2;
+    }
+
+    .home-content h3{
+        font-size: 3rem;
+    }
+
+    .home-content span{
+        font-size: 3rem;
+    }
+
+    .home-content p{
+        font-size: 1.6rem;
+        line-height: 1.8;
+        padding: 0 1rem;
+    }
+
+    .home-img img{
+        width: 80vw;
+        max-width: 420px;
+    }
+
+    .home-img::before{
+        display:none;
+    }
+
+    .btn{
+        padding:1.2rem 3rem;
+        font-size:1.7rem;
+    }
+
+}
+@media (max-width:576px){
+
+    .home{
+        padding-top:10rem;
+    }
+
+    .home-content h1{
+        font-size:3.5rem;
+    }
+
+    .home-content h3{
+        font-size:2.5rem;
+    }
+
+    .home-content span{
+        font-size:2.5rem;
+    }
+
+    .home-content p{
+        font-size:1.5rem;
+    }
+
+    .home-img img{
+    max-width:550px;
+    height:auto;
+    }
+}
+
+/* ============================= */
+/* SERVICES RESPONSIVE */
+/* ============================= */
+
+@media (max-width: 991px){
+
+    .heading{
+        font-size:5rem;
+    }
+
+    .services-content{
+        grid-template-columns:1fr;
+        gap:2rem;
+    }
+
+    .row{
+        padding:18px;
+    }
+
+    .row img{
+        border-radius:20px;
+    }
+
+    .row h4{
+        font-size:2.3rem;
+        text-align:center;
+    }
+
+    .row p{
+        font-size:1.6rem;
+        text-align:center;
+        line-height:1.7;
+    }
 
 }

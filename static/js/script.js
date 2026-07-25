@@ -3,21 +3,33 @@ let navbar = document.querySelector('.navbar');
 
 menu.onclick= () => {
     menu.classList.toggle('bx-x');
-    navbar.classList.tiggle('active');
+    navbar.classList.toggle('active');
 
-}
+};
 
 window.onscroll= () => {
     menu.classList.remove('bx-x');
     navbar.classList.remove('active');
-}
+};
+
+// Link click hote hi menu band
+document.querySelectorAll(".navbar a").forEach(link => {
+
+    link.onclick = () => {
+
+        menu.classList.remove("bx-x");
+        navbar.classList.remove("active");
+
+    };
+
+});
 
 // typing text Code
 const typed = new Typed('.multiple-text', {
-    strings: ['Physical Fitness', 'Weight Gain','Strength Training','Fat Lose','weight Lifting','Running'],
+    strings: ['Physical Fitness', 'Weight Gain','Strength Training','Fat Loss','Weight Lifting','Running'],
     typeSpeed: 70,
     backSpeed: 60,
-    baxkDelay: 1000,
+    backkDelay: 1000,
     loop: true,
 });
 
