@@ -1,0 +1,151 @@
+{% extends "super_admin/base.html" %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+    <h2>All Gyms</h2>
+
+    <a href="{{ url_for('super_admin.add_gym') }}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i>
+        Add New Gym
+    </a>
+
+</div>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover align-middle text-center mb-0">
+
+                <thead class="table-dark">
+
+                    <tr>
+
+                        <th>ID</th>
+                        <th>Gym Name</th>
+                        <th>Owner</th>
+                        <th>Username</th>
+                        <th>Plan</th>
+                        <th>Status</th>
+                        <th>Expiry</th>
+                        <th width="320">Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                {% if gyms %}
+
+                    {% for gym in gyms %}
+
+                    <tr>
+
+                        <td>{{ gym.id }}</td>
+
+                        <td>{{ gym.gym_name }}</td>
+
+                        <td>{{ gym.owner_name }}</td>
+
+                        <td>{{ gym.username }}</td>
+
+                        <td>{{ gym.plan }}</td>
+
+                        <td>
+
+                            {% if gym.status == "Active" %}
+
+                                <span class="badge bg-success">
+                                    Active
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge bg-warning text-dark">
+                                    Paused
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>{{ gym.plan_expiry_date }}</td>
+
+                        <td>
+
+                            <a href="{{ url_for('super_admin.view_gym', id=gym.id) }}"
+                               class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i>
+                                View
+                            </a>
+
+                            <a href="{{ url_for('super_admin.edit_gym', id=gym.id) }}"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i>
+                                Edit
+                            </a>
+
+                            {% if gym.status == "Active" %}
+
+                                <a href="{{ url_for('super_admin.pause_gym', id=gym.id) }}"
+                                   class="btn btn-secondary btn-sm">
+                                    <i class="bi bi-pause-fill"></i>
+                                    Pause
+                                </a>
+
+                            {% else %}
+
+                                <a href="{{ url_for('super_admin.pause_gym', id=gym.id) }}"
+                                   class="btn btn-success btn-sm">
+                                    <i class="bi bi-play-fill"></i>
+                                    Resume
+                                </a>
+
+                            {% endif %}
+
+                            <a href="{{ url_for('super_admin.delete_gym', id=gym.id) }}"
+                                class="btn btn-danger btn-sm"
+                                onclick="return confirm('Are you sure you want to delete this gym?')">
+
+                                <i class="bi bi-trash"></i>
+
+                                    Delete
+
+                            </a>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <tr>
+
+                        <td colspan="8" class="text-center py-4">
+
+                            No Gym Found
+
+                        </td>
+
+                    </tr>
+
+                {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

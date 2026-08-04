@@ -1,0 +1,94 @@
+{% extends "super_admin/base.html" %}
+
+{% block content %}
+
+<h2 class="mb-4">
+    Gym Details
+</h2>
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <table class="table">
+
+            <tr>
+                <th>ID</th>
+                <td>{{ gym.id }}</td>
+            </tr>
+
+            <tr>
+                <th>Gym Name</th>
+                <td>{{ gym.gym_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Owner</th>
+                <td>{{ gym.owner_name }}</td>
+            </tr>
+
+            <tr>
+                <th>Username</th>
+                <td>{{ gym.username }}</td>
+            </tr>
+
+            <tr>
+                <th>Phone</th>
+                <td>{{ gym.phone }}</td>
+            </tr>
+
+            <tr>
+                <th>Email</th>
+                <td>{{ gym.email }}</td>
+            </tr>
+
+            <tr>
+                <th>Plan</th>
+                <td>{{ gym.plan }}</td>
+            </tr>
+
+            <tr>
+                <th>Status</th>
+                <td>
+
+                    {% if gym.status=="Active" %}
+
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge bg-warning text-dark">
+                            Paused
+                        </span>
+
+                    {% endif %}
+
+                </td>
+            </tr>
+
+            <tr>
+                <th>Plan Expiry</th>
+                <td>{{ gym.plan_expiry_date }}</td>
+            </tr>
+
+            <tr>
+                <th>Reference By</th>
+                <td>{{ gym.reference_by or "-" }}</td>
+            </tr>
+
+        </table>
+
+        <a href="{{ url_for('super_admin.gyms') }}"
+           class="btn btn-secondary">
+
+            Back
+
+        </a>
+
+    </div>
+
+</div>
+
+{% endblock %}

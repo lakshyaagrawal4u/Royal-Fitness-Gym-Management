@@ -15,7 +15,9 @@
 
 <div class="sidebar">
 
-    <h2>Royal Fitness</h2>
+    <h2>
+        {{ session.get("gym_name", "Gym SaaS") }}
+    </h2>
 
     <a href="#"><i class='bx bxs-dashboard'></i> Dashboard</a>
 

@@ -401,3 +401,30 @@ body{
     background:#16a34a;
 
 }
+
+.card{
+    background:#242424;
+    border:none;
+    border-radius:18px;
+    color:#fff;
+}
+
+.card h6{
+    color:#bdbdbd;
+    font-size:15px;
+}
+
+.card h2{
+    color:#ffffff;
+    font-size:42px;
+    font-weight:700;
+}
+
+.gym-name{
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2ef7d1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

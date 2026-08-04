@@ -1,9 +1,10 @@
 from dateutil.relativedelta import relativedelta
 from datetime import date, datetime, timedelta
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from models import db, Admin, Member, Payment
+from models import db, SuperAdmin, Gym, Member, Payment
 from werkzeug.security import generate_password_hash, check_password_hash
 from urllib.parse import quote
+from super_admin import super_admin_bp
 
 
 app = Flask(__name__)
@@ -15,42 +16,52 @@ import os
 database_url = os.getenv("DATABASE_URL")
 
 if database_url:
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-else:
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///gym.db"
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    database_url if database_url
+    else "sqlite:///gym.db"
+)
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize Database
 db.init_app(app)
+
+app.register_blueprint(
+    super_admin_bp,
+    url_prefix="/super-admin"
+)
 
 # Create Database Tables & Default Admin
 with app.app_context():
 
     db.create_all()
 
-    admin = Admin.query.filter_by(username="admin").first()
+    super_admin = SuperAdmin.query.filter_by(username="admin").first()
 
-    if not admin:
+    if not super_admin:
 
-        admin = Admin(
+        super_admin = SuperAdmin(
             username="admin",
             password=generate_password_hash("admin123")
         )
 
-        db.session.add(admin)
+        db.session.add(super_admin)
         db.session.commit()
 
-        print("✅ Default Admin Created")
+        print("✅ Default Super Admin Created")
 
-def get_due_members():
+def get_due_members(gym_id):
 
     due_list = []
 
     today = date.today()
 
-    members = Member.query.all()
+    # Sirf current gym ke members
+    members = Member.query.filter_by(
+        gym_id=gym_id
+    ).all()
 
     for member in members:
 
@@ -58,9 +69,9 @@ def get_due_members():
         # Fee Paid Till ya Joining Date
         # ----------------------------
 
-        if member.last_fee_paid:
-            last_payment = member.last_fee_paid
-            next_due = member.last_fee_paid + relativedelta(months=1)
+        if member.fee_paid_till:
+            last_payment = member.fee_paid_till
+            next_due = member.fee_paid_till + relativedelta(months=1)
         else:
             last_payment = None
             next_due = member.joining_date + relativedelta(months=1)
@@ -71,7 +82,6 @@ def get_due_members():
 
         if today >= next_due:
 
-            # Pending Months
             pending_months = relativedelta(today, next_due)
 
             months = (
@@ -85,13 +95,9 @@ def get_due_members():
             due_list.append({
 
                 "member": member,
-
                 "last_payment": last_payment,
-
                 "next_due": next_due,
-
                 "pending_months": months,
-
                 "overdue_days": overdue_days
 
             })
@@ -102,8 +108,7 @@ def get_due_members():
 # Home Route
 @app.route("/")
 def home():
-    return render_template("index.html")
-
+    return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -111,32 +116,47 @@ def login():
 
     if request.method == "POST":
 
+
         username = request.form["username"]
         password = request.form["password"]
 
         print("Username:", username)
 
-        admin = Admin.query.filter_by(username=username).first()
+        gym = Gym.query.filter_by(username=username).first()
 
-        print("Admin Found:", admin)
+        print("Gym Found:", gym)
 
-        if admin:
-            print("Stored Hash:", admin.password)
-            print("Password Match:", check_password_hash(admin.password, password))
+        if gym:
 
-        if admin and check_password_hash(admin.password, password):
-            session["admin"] = admin.username
-            return redirect(url_for("dashboard"))
+            # 👇 Sabse pehle status check
+            if gym.status == "Paused":
+                flash("Your account has been paused. Please contact Royal Fitness.")
+                return redirect(url_for("login"))
+
+            print("Stored Hash:", gym.password)
+            print("Password Match:", check_password_hash(gym.password, password))
+
+            # 👇 Password check
+            if check_password_hash(gym.password, password):
+
+                session["gym_id"] = gym.id
+                session["gym_name"] = gym.gym_name
+
+                return redirect(url_for("dashboard"))
 
         flash("Invalid Username or Password")
 
     return render_template("login.html")
 
+
 @app.route("/change_password", methods=["GET", "POST"])
 def change_password():
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
+
+    # Current logged-in gym
+    gym = Gym.query.get_or_404(session["gym_id"])
 
     if request.method == "POST":
 
@@ -144,10 +164,8 @@ def change_password():
         new_password = request.form["new_password"]
         confirm_password = request.form["confirm_password"]
 
-        admin = Admin.query.filter_by(username=session["admin"]).first()
-
         # Current password check
-        if not check_password_hash(admin.password, current_password):
+        if not check_password_hash(gym.password, current_password):
             flash("Current password is incorrect!", "danger")
             return redirect(url_for("change_password"))
 
@@ -161,8 +179,13 @@ def change_password():
             flash("Password must be at least 8 characters.", "danger")
             return redirect(url_for("change_password"))
 
-        # Save new password
-        admin.password = generate_password_hash(new_password)
+        # Same password check
+        if check_password_hash(gym.password, new_password):
+            flash("New password cannot be the same as current password.", "danger")
+            return redirect(url_for("change_password"))
+
+        # Update password
+        gym.password = generate_password_hash(new_password)
 
         db.session.commit()
 
@@ -175,18 +198,27 @@ def change_password():
 @app.route("/dashboard")
 def dashboard():
 
-    if "admin" not in session:
+    # Login check
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
-    total_members = Member.query.count()
+    gym_id = session["gym_id"]
+    print("Gym Name =", session.get("gym_name"))
 
+    # Sirf current gym ke members
+    total_members = Member.query.filter_by(
+        gym_id=gym_id
+    ).count()
+
+    # Sirf current gym ki today's collection
     total_collection = db.session.query(
         db.func.sum(Payment.amount)
     ).filter(
+        Payment.gym_id == gym_id,
         Payment.payment_date == date.today()
     ).scalar() or 0
 
-    due_list = get_due_members()
+    due_list = get_due_members(gym_id)
     due_count = len(due_list)
 
     return render_template(
@@ -199,7 +231,8 @@ def dashboard():
 @app.route("/add_member", methods=["GET", "POST"])
 def add_member():
 
-    if "admin" not in session:
+    # Gym Login Check
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     if request.method == "POST":
@@ -216,9 +249,12 @@ def add_member():
                 flash("Please enter a valid 10-digit mobile number.", "danger")
                 return redirect(url_for("add_member"))
 
-            # -------- Duplicate Mobile --------
+            # -------- Duplicate Mobile (Same Gym Only) --------
 
-            existing_member = Member.query.filter_by(phone=phone).first()
+            existing_member = Member.query.filter_by(
+                phone=phone,
+                gym_id=session["gym_id"]
+            ).first()
 
             if existing_member:
                 flash("This mobile number is already registered.", "danger")
@@ -236,19 +272,32 @@ def add_member():
                 flash("Monthly fee must be greater than 0.", "danger")
                 return redirect(url_for("add_member"))
 
-            # -------- Last Fee Paid --------
+            # -------- Joining Date --------
 
-            last_fee_paid = None
+            joining_date = datetime.strptime(
+                request.form["joining_date"],
+                "%Y-%m-%d"
+            ).date()
 
-            if request.form["last_fee_paid"]:
-                last_fee_paid = datetime.strptime(
-                    request.form["last_fee_paid"],
+            # -------- Fee Paid Till --------
+
+            if request.form.get("fee_paid_till"):
+
+                fee_paid_till = datetime.strptime(
+                    request.form["fee_paid_till"],
                     "%Y-%m-%d"
                 ).date()
+
+            else:
+
+                # Agar blank hai to Joining Date hi save hogi
+                fee_paid_till = joining_date
 
             # -------- Create Member --------
 
             member = Member(
+
+                gym_id=session["gym_id"],
 
                 name=request.form["name"].strip(),
                 phone=phone,
@@ -256,17 +305,15 @@ def add_member():
                 gender=request.form["gender"],
                 address=request.form["address"].strip(),
 
-                joining_date=datetime.strptime(
-                    request.form["joining_date"],
-                    "%Y-%m-%d"
-                ).date(),
+                joining_date=joining_date,
 
-                last_fee_paid=last_fee_paid,
+                fee_paid_till=fee_paid_till,
 
                 membership_plan=request.form["plan"],
                 trainer=request.form["trainer"].strip(),
                 monthly_fee=monthly_fee,
                 status="Active"
+
             )
 
             db.session.add(member)
@@ -274,45 +321,49 @@ def add_member():
 
             flash("Member Added Successfully!", "success")
 
-            return redirect(url_for("add_member"))
+            return redirect(url_for("members"))
 
         except Exception as e:
 
             db.session.rollback()
 
-            print(e)
+            import traceback
+            traceback.print_exc()
 
-            flash("Something went wrong while adding the member.", "danger")
+            flash(str(e), "danger")
 
             return redirect(url_for("add_member"))
 
     return render_template("add_member.html")
-
 
 from sqlalchemy import or_
 
 @app.route("/members")
 def members():
 
-    if "admin" not in session:
+    # Gym Login Check
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     search = request.args.get("search", "").strip()
 
+    # Sirf current gym ke members
+    query = Member.query.filter_by(
+        gym_id=session["gym_id"]
+    )
+
     if search:
 
-        all_members = Member.query.filter(
+        query = query.filter(
 
             or_(
                 Member.name.ilike(f"%{search}%"),
                 Member.phone.ilike(f"%{search}%")
             )
 
-        ).all()
+        )
 
-    else:
-
-        all_members = Member.query.all()
+    all_members = query.order_by(Member.id.desc()).all()
 
     return render_template(
         "members.html",
@@ -323,7 +374,7 @@ def members():
 @app.route("/edit_member/<int:id>", methods=["GET", "POST"])
 def edit_member(id):
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     member = Member.query.get_or_404(id)
@@ -378,12 +429,12 @@ def edit_member(id):
                 "%Y-%m-%d"
             ).date()
 
-            member.last_fee_paid = (
+            member.fee_paid_till = (
                 datetime.strptime(
-                    request.form["last_fee_paid"],
+                    request.form["fee_paid_till"],
                     "%Y-%m-%d"
                 ).date()
-                if request.form["last_fee_paid"]
+                if request.form["fee_paid_till"]
                 else None
             )
 
@@ -412,12 +463,18 @@ def edit_member(id):
 @app.route("/delete_member/<int:id>")
 def delete_member(id):
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     try:
 
-        member = Member.query.get_or_404(id)
+        member = Member.query.filter_by(
+            id=id,
+            gym_id=session["gym_id"]
+        ).first_or_404()
+
+        # Pehle is member ki sari payment delete karo
+        Payment.query.filter_by(member_id=member.id).delete()
 
         db.session.delete(member)
         db.session.commit()
@@ -429,15 +486,14 @@ def delete_member(id):
         db.session.rollback()
         print(e)
 
-        flash("Unable to delete member.", "danger")
+        flash(str(e), "danger")
 
     return redirect(url_for("members"))
-
 
 @app.route("/pay_fee/<int:id>", methods=["GET", "POST"])
 def pay_fee(id):
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     member = Member.query.get_or_404(id)
@@ -448,8 +504,8 @@ def pay_fee(id):
 
     today = date.today()
 
-    if member.last_fee_paid:
-        next_due = member.last_fee_paid + relativedelta(months=1)
+    if member.fee_paid_till:
+        next_due = member.fee_paid_till + relativedelta(months=1)
     else:
         next_due = member.joining_date + relativedelta(months=1)
 
@@ -479,6 +535,8 @@ def pay_fee(id):
 
             payment = Payment(
 
+                gym_id=session["gym_id"],
+
                 member_id=member.id,
 
                 amount=amount,
@@ -499,16 +557,16 @@ def pay_fee(id):
             # Update Fee Paid Till
             # -------------------------
 
-            if member.last_fee_paid:
+            if member.fee_paid_till:
 
-                member.last_fee_paid = (
-                    member.last_fee_paid
+                member.fee_paid_till = (
+                    member.fee_paid_till
                     + relativedelta(months=months_paid)
                 )
 
             else:
 
-                member.last_fee_paid = (
+                member.fee_paid_till = (
                     member.joining_date
                     + relativedelta(months=months_paid)
                 )
@@ -523,11 +581,14 @@ def pay_fee(id):
 
             db.session.rollback()
 
+            import traceback
+            traceback.print_exc()
+
             print(e)
 
-            flash("Something went wrong while saving the payment.", "danger")
+            flash(str(e), "danger")
 
-            return redirect(url_for("pay_fee", id=id))
+            return redirect(url_for("members"))
 
     return render_template(
 
@@ -550,15 +611,15 @@ def pay_fee(id):
 @app.route("/send_reminder/<int:id>")
 def send_reminder(id):
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     member = Member.query.get_or_404(id)
 
     today = date.today()
 
-    if member.last_fee_paid:
-        next_due = member.last_fee_paid + relativedelta(months=1)
+    if member.fee_paid_till:
+        next_due = member.fee_paid_till + relativedelta(months=1)
     else:
         next_due = member.joining_date + relativedelta(months=1)
 
@@ -591,7 +652,7 @@ Royal Fitness
 @app.route("/payments")
 def payments():
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
     payments = db.session.query(Payment, Member)\
@@ -607,15 +668,15 @@ def payments():
 @app.route("/due_members")
 def due_members():
 
-    if "admin" not in session:
+    if "gym_id" not in session:
         return redirect(url_for("login"))
 
-    due_list = get_due_members()
+    due_list = get_due_members(session["gym_id"])
 
     return render_template(
-    "due_members.html",
-    due_members=due_list
-)
+        "due_members.html",
+        due_members=due_list
+    )
 
 @app.route("/logout")
 def logout():

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Gym SaaS</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+</head>
+
+<body>
+
+<div class="container-fluid">
+
+<div class="row">
+
+    <!-- Sidebar -->
+
+    <div class="col-lg-2 col-md-3 sidebar p-4">
+
+        <h4 class="mb-4">
+            Gym SaaS
+        </h4>
+
+        <a href="{{ url_for('super_admin.dashboard') }}">
+
+            <i class="bi bi-speedometer2"></i>
+
+            Dashboard
+
+        </a>
+
+        <a href="{{ url_for('super_admin.gyms') }}">
+
+            <i class="bi bi-buildings"></i>
+
+            Gyms
+
+        </a>
+
+        <a href="#">
+
+            <i class="bi bi-credit-card"></i>
+
+            Subscription
+
+        </a>
+
+        <a href="#">
+
+            <i class="bi bi-gear"></i>
+
+            Settings
+
+        </a>
+
+        <a href="{{ url_for('super_admin.logout') }}">
+
+            <i class="bi bi-box-arrow-right"></i>
+
+            Logout
+
+        </a>
+
+    </div>
+
+    <!-- Main -->
+
+    <div class="col-lg-10 col-md-9">
+
+        <nav class="navbar bg-white shadow-sm rounded mt-3">
+
+            <div class="container-fluid">
+
+                <h4 class="mb-0">
+
+                    Welcome,
+
+                    {{ session.get("super_admin_username") }}
+
+                </h4>
+
+            </div>
+
+        </nav>
+
+
+        <!-- PAGE CONTENT -->
+
+        <div class="mt-4">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
